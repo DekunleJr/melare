@@ -41,8 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# uploaded images
-/storage/
 
 # database backups (contain customer data)
 /backups/
