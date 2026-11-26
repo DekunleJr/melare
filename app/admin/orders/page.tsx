@@ -1,6 +1,6 @@
 import { and, desc, eq, like, or } from "drizzle-orm";
 import Link from "next/link";
-import { AdminHeader, PAGE_SIZE, Pagination, queryPage, queryText, Table } from "@/components/admin/ui";
+import { AdminHeader, PAGE_SIZE, Pagination, queryPage, queryText, Table, IconLink } from "@/components/admin/ui";
 import { StatusBadge } from "@/components/ui/misc";
 import { db } from "@/db";
 import { withOrderItems } from "@/db/relations";
@@ -57,14 +57,10 @@ export default async function OrdersPage({ searchParams }: PageProps<"/admin/ord
           </Link>
         )}
       </form>
-      <Table head={["Order", "Placed", "Customer", "Items", "Method", "Total", "Status"]} empty="No orders found.">
+      <Table head={["Order", "Placed", "Customer", "Items", "Method", "Total", "Status", "Action"]} empty="No orders found.">
         {rows.slice(0, PAGE_SIZE).map((o) => (
           <tr key={o.id}>
-            <td>
-              <Link href={`/admin/orders/${o.id}`} prefetch={false} className="link">
-                {o.number}
-              </Link>
-            </td>
+            <td>{o.number}</td>
             <td className="whitespace-nowrap">{formatDateTime(o.createdAt)}</td>
             <td>
               {o.customerName}
@@ -75,6 +71,9 @@ export default async function OrdersPage({ searchParams }: PageProps<"/admin/ord
             <td>{formatPence(o.totalPence)}</td>
             <td>
               <StatusBadge status={o.status} />
+            </td>
+            <td>
+              <IconLink href={`/admin/orders/${o.id}`} label={`Edit order ${o.number}`} />
             </td>
           </tr>
         ))}

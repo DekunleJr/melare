@@ -23,8 +23,15 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   images: {
-    // Every site image is an upload served by app/uploads/[name]/route.ts.
-    localPatterns: [{ pathname: "/uploads/**", search: "" }],
+    // Uploads are served by app/uploads/[name]/route.ts; fixed page photos live in public/images.
+    localPatterns: [
+      { pathname: "/uploads/**", search: "" },
+      { pathname: "/images/**", search: "" },
+    ],
+  },
+  async redirects() {
+    // The team is now introduced on the About page; keep old links working.
+    return [{ source: "/team", destination: "/about#team", permanent: false }];
   },
   async headers() {
     return [

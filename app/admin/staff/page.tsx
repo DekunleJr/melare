@@ -1,10 +1,12 @@
 import { asc } from "drizzle-orm";
 import Link from "next/link";
+import { RowActions } from "@/components/admin/row-actions";
 import { AdminHeader, Table } from "@/components/admin/ui";
 import { Photo, StatusBadge } from "@/components/ui/misc";
 import { db } from "@/db";
 import { withStaffDetails } from "@/db/relations";
 import { staff } from "@/db/schema";
+import { deleteListedStaff, setStaffStatus } from "@/features/admin/catalog-actions";
 import { requireAdmin } from "@/lib/session";
 import { WEEKDAYS } from "@/lib/time";
 
@@ -22,7 +24,7 @@ export default async function StaffPage() {
           Add team member
         </Link>
       </AdminHeader>
-      <Table head={["", "Name", "Role", "Services", "Working days", "Status"]} empty="No staff yet. Add someone so customers can book.">
+      <Table head={["", "Name", "Role", "Services", "Working days", "Status", "Action"]} empty="No staff yet. Add someone so customers can book.">
         {rows.map((p) => {
           const days = [...new Set(p.hours.map((h) => h.weekday))].sort((a, b) => a - b);
           return (
@@ -30,11 +32,7 @@ export default async function StaffPage() {
               <td className="w-16">
                 <Photo src={p.imagePath} alt={p.name} className="size-12 rounded-full" sizes="48px" />
               </td>
-              <td>
-                <Link href={`/admin/staff/${p.id}`} prefetch={false} className="link">
-                  {p.name}
-                </Link>
-              </td>
+              <td>{p.name}</td>
               <td>{p.title}</td>
               <td>{p.services.length}</td>
               <td className={days.length ? "" : "text-red-700"}>
@@ -42,6 +40,16 @@ export default async function StaffPage() {
               </td>
               <td>
                 <StatusBadge status={p.active ? "active" : "archived"} />
+              </td>
+              <td>
+                <RowActions
+                  name={p.name}
+                  status={p.active ? "active" : "archived"}
+                  editHref={`/admin/staff/${p.id}`}
+                  statusAction={setStaffStatus.bind(null, p.id)}
+                  deleteAction={deleteListedStaff.bind(null, p.id)}
+                  deleteNote="A team member who has bookings is archived instead."
+                />
               </td>
             </tr>
           );

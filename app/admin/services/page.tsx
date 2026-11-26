@@ -1,10 +1,12 @@
 import { asc } from "drizzle-orm";
 import Link from "next/link";
+import { RowActions } from "@/components/admin/row-actions";
 import { AdminHeader, Table } from "@/components/admin/ui";
 import { StatusBadge } from "@/components/ui/misc";
 import { db } from "@/db";
 import { withServiceStaff } from "@/db/relations";
 import { services } from "@/db/schema";
+import { deleteListedService, setServiceStatus } from "@/features/admin/catalog-actions";
 import { label } from "@/lib/labels";
 import { formatPence } from "@/lib/money";
 import { requireAdmin } from "@/lib/session";
@@ -27,14 +29,10 @@ export default async function ServicesAdminPage() {
           Add service
         </Link>
       </AdminHeader>
-      <Table head={["Name", "Group", "Duration", "Price", "Payment", "Staff", "Status"]} empty="No services yet.">
+      <Table head={["Name", "Group", "Duration", "Price", "Payment", "Staff", "Status", "Action"]} empty="No services yet.">
         {rows.map((s) => (
           <tr key={s.id}>
-            <td>
-              <Link href={`/admin/services/${s.id}`} prefetch={false} className="link">
-                {s.name}
-              </Link>
-            </td>
+            <td>{s.name}</td>
             <td>{s.category}</td>
             <td>{formatDuration(s.durationMinutes)}</td>
             <td>{formatPence(s.pricePence)}</td>
@@ -45,6 +43,16 @@ export default async function ServicesAdminPage() {
             <td className={s.staff.length ? "" : "text-red-700"}>{s.staff.length || "None"}</td>
             <td>
               <StatusBadge status={s.status} />
+            </td>
+            <td>
+              <RowActions
+                name={s.name}
+                status={s.status}
+                editHref={`/admin/services/${s.id}`}
+                statusAction={setServiceStatus.bind(null, s.id)}
+                deleteAction={deleteListedService.bind(null, s.id)}
+                deleteNote="A service that has bookings is archived instead."
+              />
             </td>
           </tr>
         ))}

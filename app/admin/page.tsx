@@ -1,7 +1,7 @@
 import { and, asc, count, eq, gte, inArray, lt, lte, sql, sum } from "drizzle-orm";
 import Link from "next/link";
 import { connection } from "next/server";
-import { AdminHeader, Table } from "@/components/admin/ui";
+import { AdminHeader, Table, IconLink } from "@/components/admin/ui";
 import { StatusBadge } from "@/components/ui/misc";
 import { db } from "@/db";
 import {
@@ -143,7 +143,7 @@ export default async function DashboardPage() {
       <ul className="grid grid-cols-2 gap-4 xl:grid-cols-3">
         {stats.map(([name, value, href]) => (
           <li key={name}>
-            <Link href={href} prefetch={false} className="card block hover:border-clay">
+            <Link href={href} prefetch={false} className="card block hover:border-bronze">
               <p className="text-sm text-muted">{name}</p>
               <p className="mt-1 text-3xl font-semibold">{value}</p>
             </Link>
@@ -153,18 +153,17 @@ export default async function DashboardPage() {
       {d.requests.length > 0 && (
         <section>
           <h2 className="mb-3 font-display text-2xl">Waiting for your approval</h2>
-          <Table head={["When", "Customer", "Service", "Where", "Reply by"]} empty="">
+          <Table head={["When", "Customer", "Service", "Where", "Reply by", "Action"]} empty="">
             {d.requests.map((b) => (
               <tr key={b.id}>
-                <td>
-                  <Link href={`/admin/bookings/${b.id}`} prefetch={false} className="link">
-                    {formatDateTime(b.startsAt)}
-                  </Link>
-                </td>
+                <td>{formatDateTime(b.startsAt)}</td>
                 <td>{b.customerName}</td>
                 <td>{b.serviceName}</td>
                 <td>{b.locationType === "mobile" ? b.postcode : "Salon"}</td>
                 <td>{b.holdExpiresAt && formatDateTime(b.holdExpiresAt)}</td>
+                <td>
+                  <IconLink href={`/admin/bookings/${b.id}`} label={`Edit booking ${b.reference}`} />
+                </td>
               </tr>
             ))}
           </Table>
@@ -172,19 +171,18 @@ export default async function DashboardPage() {
       )}
       <section>
         <h2 className="mb-3 font-display text-2xl">Today</h2>
-        <Table head={["Time", "Customer", "Service", "With", "Status"]} empty="No appointments today.">
+        <Table head={["Time", "Customer", "Service", "With", "Status", "Action"]} empty="No appointments today.">
           {d.todays.map((b) => (
             <tr key={b.id}>
-              <td>
-                <Link href={`/admin/bookings/${b.id}`} prefetch={false} className="link">
-                  {formatTime(b.startsAt)}
-                </Link>
-              </td>
+              <td>{formatTime(b.startsAt)}</td>
               <td>{b.customerName}</td>
               <td>{b.serviceName}</td>
               <td>{b.staffName}</td>
               <td>
                 <StatusBadge status={b.status} />
+              </td>
+              <td>
+                <IconLink href={`/admin/bookings/${b.id}`} label={`Edit booking ${b.reference}`} />
               </td>
             </tr>
           ))}
@@ -192,14 +190,10 @@ export default async function DashboardPage() {
       </section>
       <section>
         <h2 className="mb-3 font-display text-2xl">Orders to fulfil</h2>
-        <Table head={["Order", "Date", "Customer", "Method", "Total", "Status"]} empty="Nothing waiting.">
+        <Table head={["Order", "Date", "Customer", "Method", "Total", "Status", "Action"]} empty="Nothing waiting.">
           {d.toFulfil.map((o) => (
             <tr key={o.id}>
-              <td>
-                <Link href={`/admin/orders/${o.id}`} prefetch={false} className="link">
-                  {o.number}
-                </Link>
-              </td>
+              <td>{o.number}</td>
               <td>{formatShortDate(o.createdAt)}</td>
               <td>{o.customerName}</td>
               <td>{o.fulfilment === "delivery" ? "Delivery" : "Pickup"}</td>
@@ -207,22 +201,26 @@ export default async function DashboardPage() {
               <td>
                 <StatusBadge status={o.status} />
               </td>
+              <td>
+                <IconLink href={`/admin/orders/${o.id}`} label={`Edit order ${o.number}`} />
+              </td>
             </tr>
           ))}
         </Table>
       </section>
       <section>
         <h2 className="mb-3 font-display text-2xl">Low stock</h2>
-        <Table head={["Product", "In stock"]} empty="Stock levels look fine.">
+        <Table head={["Product", "In stock", "Action"]} empty="Stock levels look fine.">
           {d.lowStock.map(({ variant, product }) => (
             <tr key={variant.id}>
               <td>
-                <Link href={`/admin/products/${product.id}`} prefetch={false} className="link">
-                  {product.name}
-                </Link>
+                {product.name}
                 <span className="ml-2 text-muted">{variantLabel(variant)}</span>
               </td>
               <td>{variant.stock}</td>
+              <td>
+                <IconLink href={`/admin/products/${product.id}`} label={`Edit ${product.name}`} />
+              </td>
             </tr>
           ))}
         </Table>

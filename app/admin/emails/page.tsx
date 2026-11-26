@@ -22,7 +22,7 @@ export default async function EmailsPage({ searchParams }: PageProps<"/admin/ema
   return (
     <>
       <AdminHeader title="Email log" />
-      <Table head={["When", "To", "Subject", "Status", ""]} empty="No emails yet.">
+      <Table head={["When", "To", "Subject", "Status", "Action"]} empty="No emails yet.">
         {rows.slice(0, PAGE_SIZE).map((m) => (
           <tr key={m.id}>
             <td className="whitespace-nowrap">{formatDateTime(m.createdAt)}</td>

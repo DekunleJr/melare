@@ -1,4 +1,5 @@
 import { desc } from "drizzle-orm";
+import { Trash2 } from "lucide-react";
 import { ActionButton, AdminHeader, PAGE_SIZE, Pagination, queryPage, Table } from "@/components/admin/ui";
 import { db } from "@/db";
 import { subscribers } from "@/db/schema";
@@ -35,14 +36,15 @@ export default async function SubscribersPage({ searchParams }: PageProps<"/admi
           ? "New subscribers are added to your Resend segment. Write and send campaigns in Resend under Broadcasts."
           : "To send campaigns, set RESEND_SEGMENT_ID so subscribers are copied into Resend (see the README), or import the CSV into your email tool."}
       </p>
-      <Table head={["Email", "Joined", ""]} empty="No subscribers yet.">
+      <Table head={["Email", "Joined", "Action"]} empty="No subscribers yet.">
         {rows.slice(0, PAGE_SIZE).map((s) => (
           <tr key={s.id}>
             <td>{s.email}</td>
             <td>{formatShortDate(s.createdAt)}</td>
-            <td className="text-right">
+            <td>
               <ActionButton action={removeSubscriber.bind(null, s.id)} confirm="Remove this subscriber?" danger>
-                Remove
+                <Trash2 size={14} aria-hidden="true" />
+                Delete
               </ActionButton>
             </td>
           </tr>

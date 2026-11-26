@@ -1,3 +1,4 @@
+import { Download } from "lucide-react";
 import { connection } from "next/server";
 import { ActionButton, AdminHeader, Table } from "@/components/admin/ui";
 import { backupNow, resetCalendarLinks } from "@/features/admin/commerce-actions";
@@ -52,7 +53,7 @@ export default async function DataPage() {
             There is no backup from the last two days.
           </p>
         )}
-        <Table head={["Made", "Folder", "Database size", ""]} empty="No backups yet.">
+        <Table head={["Made", "Folder", "Database size", "Action"]} empty="No backups yet.">
           {backups.map((b) => (
             <tr key={b.name}>
               <td>{formatDateTime(b.createdAt)}</td>
@@ -61,7 +62,8 @@ export default async function DataPage() {
               </td>
               <td>{Math.ceil(b.databaseBytes / 1024)} KB</td>
               <td>
-                <a download href={`/api/admin/backups/${b.name}`} className="link">
+                <a download href={`/api/admin/backups/${b.name}`} className="btn btn-outline btn-sm">
+                  <Download size={14} aria-hidden="true" />
                   Download
                 </a>
               </td>

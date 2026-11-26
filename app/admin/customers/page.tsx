@@ -1,6 +1,6 @@
 import { sql, type SQL } from "drizzle-orm";
-import Link from "next/link";
-import { AdminHeader, PAGE_SIZE, Pagination, queryPage, queryText, Table } from "@/components/admin/ui";
+import { Eye } from "lucide-react";
+import { AdminHeader, PAGE_SIZE, Pagination, queryPage, queryText, Table, IconLink } from "@/components/admin/ui";
 import { StatusBadge } from "@/components/ui/misc";
 import { db } from "@/db";
 import { requireAdmin } from "@/lib/session";
@@ -59,20 +59,19 @@ export default async function CustomersPage({ searchParams }: PageProps<"/admin/
           <button className="btn btn-outline btn-sm">Search</button>
         </form>
       </AdminHeader>
-      <Table head={["Name", "Email", "Type", "Paid orders", "Bookings"]} empty="No customers found.">
+      <Table head={["Name", "Email", "Type", "Paid orders", "Bookings", "Action"]} empty="No customers found.">
         {rows.slice(0, PAGE_SIZE).map((c) => (
           <tr key={c.email}>
-            <td>
-              <Link href={`/admin/customers/view?email=${encodeURIComponent(c.email)}`} prefetch={false} className="link">
-                {c.name}
-              </Link>
-            </td>
+            <td>{c.name}</td>
             <td>{c.email}</td>
             <td>
               <StatusBadge status={Number(c.has_account) ? "customer" : "logged"} />
             </td>
             <td>{Number(c.orders)}</td>
             <td>{Number(c.bookings)}</td>
+            <td>
+              <IconLink href={`/admin/customers/view?email=${encodeURIComponent(c.email)}`} label={`View ${c.name}`} icon={Eye} />
+            </td>
           </tr>
         ))}
       </Table>

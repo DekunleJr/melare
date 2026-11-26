@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { AdminHeader, Table } from "@/components/admin/ui";
+import { AdminHeader, Table, IconLink } from "@/components/admin/ui";
 import { db } from "@/db";
 import { contentPages } from "@/db/schema";
 import { defaultPages, PAGE_SLUGS } from "@/lib/default-pages";
@@ -14,18 +13,17 @@ export default async function PagesPage() {
   return (
     <div className="max-w-3xl">
       <AdminHeader title="Policy and information pages" />
-      <Table head={["Page", "Address", "Last edited"]} empty="">
+      <Table head={["Page", "Address", "Last edited", "Action"]} empty="">
         {PAGE_SLUGS.map((slug) => {
           const page = saved.find((p) => p.slug === slug);
           return (
             <tr key={slug}>
-              <td>
-                <Link href={`/admin/pages/${slug}`} prefetch={false} className="link">
-                  {page?.title ?? defaultPages[slug].title}
-                </Link>
-              </td>
+              <td>{page?.title ?? defaultPages[slug].title}</td>
               <td>/{slug}</td>
               <td>{page ? formatShortDate(page.updatedAt) : "Starting text"}</td>
+              <td>
+                <IconLink href={`/admin/pages/${slug}`} label={`Edit ${page?.title ?? defaultPages[slug].title}`} />
+              </td>
             </tr>
           );
         })}

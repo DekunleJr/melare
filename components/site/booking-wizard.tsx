@@ -304,7 +304,7 @@ export function BookingWizard({
                           setAddonIds([]);
                           resetTime();
                         }}
-                        className={`cursor-pointer rounded-xl border p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${serviceId === s.id ? "border-clay bg-clay/5 ring-1 ring-clay" : "border-line hover:border-clay"}`}
+                        className={`cursor-pointer rounded-xl border p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${serviceId === s.id ? "border-bronze bg-bronze/5 ring-1 ring-bronze" : "border-line hover:border-bronze"}`}
                       >
                         <span className="flex justify-between gap-3 font-semibold">
                           <span>{s.name}</span>
@@ -377,11 +377,11 @@ export function BookingWizard({
         <Step number={step++} title="Add extras">
           <div className="grid gap-2">
             {service.addons.map((a) => (
-              <label key={a.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-line p-3 text-sm has-checked:border-clay has-checked:bg-clay/5">
+              <label key={a.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-line p-3 text-sm has-checked:border-bronze has-checked:bg-bronze/5">
                 <span className="flex items-center gap-3">
                   <input
                     type="checkbox"
-                    className="size-4 accent-clay"
+                    className="size-4 accent-bronze"
                     checked={addonIds.includes(a.id)}
                     onChange={(e) => {
                       setAddonIds(e.target.checked ? [...addonIds, a.id] : addonIds.filter((x) => x !== a.id));
@@ -449,7 +449,7 @@ export function BookingWizard({
           </p>
           {bag.items.length > 0 && (
             <label className="mb-4 flex items-center gap-2 rounded-xl bg-sand p-3 text-sm">
-              <input type="checkbox" className="size-4 accent-clay" checked={includeBag} onChange={(e) => setIncludeBag(e.target.checked)} />
+              <input type="checkbox" className="size-4 accent-bronze" checked={includeBag} onChange={(e) => setIncludeBag(e.target.checked)} />
               Include the {bag.count} item(s) already in my shopping bag
             </label>
           )}

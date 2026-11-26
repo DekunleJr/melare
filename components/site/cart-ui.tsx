@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ActionForm, Field, Honeypot, SubmitButton, TextArea } from "@/components/ui/form";
 import { EmptyState, Loading, Photo } from "@/components/ui/misc";
+import { NavLink } from "@/components/ui/nav-link";
 import {
   getCartProducts,
   rememberBasket,
@@ -18,14 +19,14 @@ import { DiscountField, SummaryLines, useQuote } from "./totals";
 export function CartLink() {
   const { count } = useCart();
   return (
-    <Link href="/cart" className="relative p-2" aria-label={`Shopping bag, ${count} items`}>
+    <NavLink href="/cart" className="relative rounded-full p-2" aria-label={`Shopping bag, ${count} items`}>
       <ShoppingBag size={20} />
       {count > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 grid size-5 place-items-center rounded-full bg-clay text-[10px] font-bold text-white">
+        <span className="absolute -top-0.5 -right-0.5 grid size-5 place-items-center rounded-full bg-gold text-[10px] font-bold text-black">
           {count}
         </span>
       )}
-    </Link>
+    </NavLink>
   );
 }
 
@@ -191,14 +192,14 @@ export function MarketingChoices({ reminder }: { reminder?: { onChange: (v: bool
           <input
             type="checkbox"
             name="remind"
-            className="mt-1 size-4 accent-clay"
+            className="mt-1 size-4 accent-bronze"
             onChange={(e) => reminder.onChange(e.target.checked)}
           />
           Email me one reminder if I do not finish checking out.
         </label>
       )}
       <label className="flex items-start gap-2">
-        <input type="checkbox" name="marketing" className="mt-1 size-4 accent-clay" />
+        <input type="checkbox" name="marketing" className="mt-1 size-4 accent-bronze" />
         Send me news and offers by email. You can unsubscribe at any time.
       </label>
     </div>
@@ -228,9 +229,9 @@ export function DeliveryChoice({
         </p>
       )}
       {options.map((o) => (
-        <label key={o.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-line p-3 text-sm has-checked:border-clay has-checked:bg-clay/5">
+        <label key={o.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-line p-3 text-sm has-checked:border-bronze has-checked:bg-bronze/5">
           <span className="flex items-center gap-3">
-            <input type="radio" className="size-4 accent-clay" checked={current?.id === o.id} onChange={() => onSelect(o.id)} />
+            <input type="radio" className="size-4 accent-bronze" checked={current?.id === o.id} onChange={() => onSelect(o.id)} />
             <span>
               <span className="font-semibold">{o.name}</span>
               {o.description && <span className="block text-muted">{o.description}</span>}

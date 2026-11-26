@@ -2,7 +2,7 @@ import { and, asc, eq, gt, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { StaffForm } from "@/components/admin/staff-form";
-import { ActionButton, AdminHeader, Created } from "@/components/admin/ui";
+import { ActionButton, AdminHeader, BackButton, Created } from "@/components/admin/ui";
 import { ActionForm, Field, SubmitButton } from "@/components/ui/form";
 import { db } from "@/db";
 import { services, staff, staffServices, timeOff, workingHours } from "@/db/schema";
@@ -40,79 +40,83 @@ export default async function EditStaffPage({ params, searchParams }: PageProps<
   const settings = await readSettings();
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <>
+      {/* Outside the narrow column, so the buttons sit at the right edge of the page. */}
       <AdminHeader title={person.name}>
         <ActionButton action={deleteStaff.bind(null, id)} confirm="Delete this team member?" danger>
           Delete
         </ActionButton>
+        <BackButton href="/admin/staff" />
       </AdminHeader>
-      <Created show={(await searchParams).created} />
-      <StaffForm person={person} serviceList={list} assigned={links.map((l) => l.serviceId)} />
+      <div className="max-w-3xl space-y-6">
+        <Created show={(await searchParams).created} />
+        <StaffForm person={person} serviceList={list} assigned={links.map((l) => l.serviceId)} />
 
-      <section className="card">
-        <h2 className="mb-2 font-display text-2xl">Calendar link</h2>
-        <p className="mb-3 text-sm text-muted">
-          Subscribe to this in Google, Apple or Outlook calendar to see {person.name}&apos;s
-          bookings. It updates by itself. Anyone with the link can see them, so share it carefully.
-        </p>
-        <input
-          className="input"
-          readOnly
-          aria-label="Calendar subscription link"
-          value={`${env.siteUrl}/api/calendar/${feedToken("staff", String(id), settings.calendarNonce)}.ics`}
-        />
-      </section>
+        <section className="card">
+          <h2 className="mb-2 font-display text-2xl">Calendar link</h2>
+          <p className="mb-3 text-sm text-muted">
+            Subscribe to this in Google, Apple or Outlook calendar to see {person.name}&apos;s
+            bookings. It updates by itself. Anyone with the link can see them, so share it carefully.
+          </p>
+          <input
+            className="input"
+            readOnly
+            aria-label="Calendar subscription link"
+            value={`${env.siteUrl}/api/calendar/${feedToken("staff", String(id), settings.calendarNonce)}.ics`}
+          />
+        </section>
 
-      <section className="card">
-        <h2 className="font-display text-2xl">Weekly hours</h2>
-        <p className="mb-4 text-sm text-muted">Customers can only book inside these hours. Breaks are optional.</p>
-        <ActionForm action={saveHours.bind(null, id)} className="space-y-3">
-          {[1, 2, 3, 4, 5, 6, 0].map((weekday) => {
-            const shifts = hours.filter((h) => h.weekday === weekday);
-            const first = shifts[0];
-            const last = shifts.at(-1);
-            const hasBreak = shifts.length > 1;
-            return (
-              <div key={weekday} className="grid grid-cols-2 items-end gap-2 border-b border-line pb-3 sm:grid-cols-5">
-                <label className="col-span-2 flex items-center gap-2 text-sm font-medium sm:col-span-1 sm:pb-3">
-                  <input type="checkbox" name={`open_${weekday}`} className="size-4 accent-clay" defaultChecked={shifts.length > 0} />
-                  {WEEKDAYS[weekday]}
-                </label>
-                {timeInput(`start_${weekday}`, "Start", first?.startMinute ?? 9 * 60)}
-                {timeInput(`end_${weekday}`, "Finish", last?.endMinute ?? 17 * 60)}
-                {timeInput(`breakStart_${weekday}`, "Break from", hasBreak ? first.endMinute : undefined)}
-                {timeInput(`breakEnd_${weekday}`, "Break to", hasBreak ? shifts[1].startMinute : undefined)}
-              </div>
-            );
-          })}
-          <SubmitButton>Save hours</SubmitButton>
-        </ActionForm>
-      </section>
+        <section className="card">
+          <h2 className="font-display text-2xl">Weekly hours</h2>
+          <p className="mb-4 text-sm text-muted">Customers can only book inside these hours. Breaks are optional.</p>
+          <ActionForm action={saveHours.bind(null, id)} className="space-y-3">
+            {[1, 2, 3, 4, 5, 6, 0].map((weekday) => {
+              const shifts = hours.filter((h) => h.weekday === weekday);
+              const first = shifts[0];
+              const last = shifts.at(-1);
+              const hasBreak = shifts.length > 1;
+              return (
+                <div key={weekday} className="grid grid-cols-2 items-end gap-2 border-b border-line pb-3 sm:grid-cols-5">
+                  <label className="col-span-2 flex items-center gap-2 text-sm font-medium sm:col-span-1 sm:pb-3">
+                    <input type="checkbox" name={`open_${weekday}`} className="size-4 accent-bronze" defaultChecked={shifts.length > 0} />
+                    {WEEKDAYS[weekday]}
+                  </label>
+                  {timeInput(`start_${weekday}`, "Start", first?.startMinute ?? 9 * 60)}
+                  {timeInput(`end_${weekday}`, "Finish", last?.endMinute ?? 17 * 60)}
+                  {timeInput(`breakStart_${weekday}`, "Break from", hasBreak ? first.endMinute : undefined)}
+                  {timeInput(`breakEnd_${weekday}`, "Break to", hasBreak ? shifts[1].startMinute : undefined)}
+                </div>
+              );
+            })}
+            <SubmitButton>Save hours</SubmitButton>
+          </ActionForm>
+        </section>
 
-      <section className="card space-y-4">
-        <h2 className="font-display text-2xl">Time off and holidays</h2>
-        <ActionForm action={addTimeOff.bind(null, id)} resetOnSuccess className="grid gap-3 sm:grid-cols-2">
-          <Field name="startsAt" label="From" type="datetime-local" required />
-          <Field name="endsAt" label="Until" type="datetime-local" required />
-          <Field name="reason" label="Reason (private)" wrapperClass="sm:col-span-2" />
-          <div className="sm:col-span-2">
-            <SubmitButton className="btn btn-outline">Add time off</SubmitButton>
-          </div>
-        </ActionForm>
-        <ul className="divide-y divide-line">
-          {away.map((o) => (
-            <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
-              <span>
-                {formatDateTime(o.startsAt)} to {formatDateTime(o.endsAt)}
-                {o.reason && <span className="text-muted"> · {o.reason}</span>}
-              </span>
-              <ActionButton action={removeTimeOff.bind(null, o.id)} danger>
-                Remove
-              </ActionButton>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
+        <section className="card space-y-4">
+          <h2 className="font-display text-2xl">Time off and holidays</h2>
+          <ActionForm action={addTimeOff.bind(null, id)} resetOnSuccess className="grid gap-3 sm:grid-cols-2">
+            <Field name="startsAt" label="From" type="datetime-local" required />
+            <Field name="endsAt" label="Until" type="datetime-local" required />
+            <Field name="reason" label="Reason (private)" wrapperClass="sm:col-span-2" />
+            <div className="sm:col-span-2">
+              <SubmitButton className="btn btn-outline">Add time off</SubmitButton>
+            </div>
+          </ActionForm>
+          <ul className="divide-y divide-line">
+            {away.map((o) => (
+              <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
+                <span>
+                  {formatDateTime(o.startsAt)} to {formatDateTime(o.endsAt)}
+                  {o.reason && <span className="text-muted"> · {o.reason}</span>}
+                </span>
+                <ActionButton action={removeTimeOff.bind(null, o.id)} danger>
+                  Remove
+                </ActionButton>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    </>
   );
 }

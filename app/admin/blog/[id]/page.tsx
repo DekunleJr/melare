@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PostForm } from "@/components/admin/post-form";
-import { ActionButton, AdminHeader, Created } from "@/components/admin/ui";
+import { ActionButton, AdminHeader, Created, BackButton } from "@/components/admin/ui";
 import { db } from "@/db";
 import { posts } from "@/db/schema";
 import { deletePost } from "@/features/admin/commerce-actions";
@@ -16,7 +16,8 @@ export default async function EditPostPage({ params, searchParams }: PageProps<"
   const [post] = await db.select().from(posts).where(eq(posts.id, id));
   if (!post) notFound();
   return (
-    <div className="max-w-3xl space-y-4">
+    <>
+      {/* Outside the narrow column, so the buttons sit at the right edge of the page. */}
       <AdminHeader title={post.title}>
         {post.status === "published" && (
           <Link href={`/blog/${post.slug}`} prefetch={false} className="btn btn-outline btn-sm">
@@ -26,9 +27,12 @@ export default async function EditPostPage({ params, searchParams }: PageProps<"
         <ActionButton action={deletePost.bind(null, id)} confirm="Delete this article?" danger>
           Delete
         </ActionButton>
+        <BackButton href="/admin/blog" />
       </AdminHeader>
-      <Created show={(await searchParams).created} />
-      <PostForm post={post} />
-    </div>
+      <div className="max-w-3xl space-y-4">
+        <Created show={(await searchParams).created} />
+        <PostForm post={post} />
+      </div>
+    </>
   );
 }

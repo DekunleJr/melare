@@ -1,15 +1,15 @@
 "use client";
 
 import { Menu, User, X } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
+import { NavLink } from "@/components/ui/nav-link";
 
 /** Signed-out visitors are redirected to sign in, so no session read is needed here. */
 export function AccountLink() {
   return (
-    <Link href="/account" prefetch={false} className="p-2" aria-label="My account">
+    <NavLink href="/account" prefetch={false} className="block rounded-full p-2" aria-label="My account">
       <User size={20} />
-    </Link>
+    </NavLink>
   );
 }
 
@@ -29,17 +29,17 @@ export function MobileMenu({ links }: { links: { href: string; label: string }[]
       {open && (
         <nav
           aria-label="Mobile"
-          className="absolute inset-x-0 top-16 border-b border-line bg-cream shadow-lg"
+          className="absolute inset-x-0 top-20 border-b border-white/10 bg-black text-cream shadow-lg"
         >
           {links.map((link) => (
-            <Link
+            <NavLink
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="block border-t border-line/60 px-6 py-3.5"
+              className="block border-t border-white/10 px-6 py-3.5 hover:text-gold"
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
         </nav>
       )}

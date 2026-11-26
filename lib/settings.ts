@@ -12,7 +12,7 @@ export const defaultSettings = {
     "Expert braiding, styling and colour in our salon or at your home, with the extensions and care products to match.",
   heroImage: "",
   aboutText:
-    "MelareBeauty is a hairdressing and hair products business in the UK. Tell your story here: who you are, what you specialise in and what a visit feels like.",
+    "MelareBeauty is a hairdressing and hair products business in the UK. We bring braiding, styling and colour together with the extensions, hair care and styling tools that help you look after your hair between visits.",
   phone: "",
   publicEmail: "",
   contactEmail: "",

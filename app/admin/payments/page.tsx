@@ -1,4 +1,5 @@
 import { and, desc, eq, inArray, like, or } from "drizzle-orm";
+import { Eye } from "lucide-react";
 import Link from "next/link";
 import { AdminHeader, PAGE_SIZE, Pagination, queryPage, queryText, Table } from "@/components/admin/ui";
 import { StatusBadge } from "@/components/ui/misc";
@@ -76,7 +77,7 @@ export default async function PaymentsPage({ searchParams }: PageProps<"/admin/p
         </select>
         <button className="btn btn-outline btn-sm">Filter</button>
       </form>
-      <Table head={["Payment", "Date", "Method", "For", "Amount", "Refunded", "Status"]} empty="No payments found.">
+      <Table head={["Payment", "Date", "Method", "For", "Amount", "Refunded", "Status", "Action"]} empty="No payments found.">
         {shown.map((p) => (
           <tr key={p.id}>
             <td>
@@ -85,22 +86,27 @@ export default async function PaymentsPage({ searchParams }: PageProps<"/admin/p
             </td>
             <td className="whitespace-nowrap">{formatDateTime(p.completedAt ?? p.createdAt)}</td>
             <td>{label(p.method)}</td>
-            <td className="space-x-2">
-              {p.bookingId && (
-                <Link href={`/admin/bookings/${p.bookingId}`} prefetch={false} className="link">
-                  Booking
-                </Link>
-              )}
-              {p.orderId && (
-                <Link href={`/admin/orders/${p.orderId}`} prefetch={false} className="link">
-                  Order
-                </Link>
-              )}
-            </td>
+            <td>{[p.bookingId && "Booking", p.orderId && "Order"].filter(Boolean).join(", ")}</td>
             <td>{formatPence(p.amountPence)}</td>
             <td>{formatPence((back.get(p.id) ?? []).reduce((n, r) => n + r.amountPence, 0))}</td>
             <td>
               <StatusBadge status={p.status} />
+            </td>
+            <td>
+              <div className="flex gap-2 whitespace-nowrap">
+                {p.bookingId && (
+                  <Link href={`/admin/bookings/${p.bookingId}`} prefetch={false} className="btn btn-outline btn-sm">
+                    <Eye size={14} aria-hidden="true" />
+                    Booking
+                  </Link>
+                )}
+                {p.orderId && (
+                  <Link href={`/admin/orders/${p.orderId}`} prefetch={false} className="btn btn-outline btn-sm">
+                    <Eye size={14} aria-hidden="true" />
+                    Order
+                  </Link>
+                )}
+              </div>
             </td>
           </tr>
         ))}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { Logo } from "@/components/site/logo";
 import { PrintButton } from "@/components/site/print-button";
 import { DetailList, Loading } from "@/components/ui/misc";
 import { accessPayment } from "@/features/access";
@@ -67,7 +68,10 @@ async function Receipt({ token }: { token: string }) {
   return (
     <div className="card space-y-5">
       <div>
-        <p className="font-display text-3xl">{s.businessName}</p>
+        <div className="mb-3 inline-block rounded-xl bg-black p-3">
+          {/* Printers may drop the black box, so the artwork keeps its own background. */}
+          <Logo name={s.businessName} className="h-24 print:mix-blend-normal" />
+        </div>
         <p className="text-sm whitespace-pre-line text-muted">
           {[s.address, s.publicEmail, s.phone].filter(Boolean).join("\n")}
         </p>

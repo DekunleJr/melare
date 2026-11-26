@@ -104,7 +104,7 @@ export function SlotPicker({
                 onClick={() => choose(key)}
                 className={`aspect-square rounded-full transition-colors ${
                   day === key
-                    ? "bg-clay text-white"
+                    ? "bg-gold font-semibold text-black"
                     : open
                       ? "cursor-pointer hover:bg-sand"
                       : "text-muted/40"

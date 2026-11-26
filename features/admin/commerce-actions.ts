@@ -291,16 +291,49 @@ export async function savePost(
   });
 }
 
+async function removePost(postId: number) {
+  const [old] = await db.select().from(posts).where(eq(posts.id, id.parse(postId)));
+  if (old) {
+    await db.delete(posts).where(eq(posts.id, old.id));
+    await deleteImage(old.coverImage);
+  }
+  updateTag(TAGS.posts);
+}
+
+/** Delete from the article's own page, which then returns to the list. */
 export async function deletePost(postId: number): Promise<FormState> {
   await requireAdmin();
   return runAction(async () => {
-    const [old] = await db.select().from(posts).where(eq(posts.id, id.parse(postId)));
-    if (old) {
-      await db.delete(posts).where(eq(posts.id, old.id));
-      await deleteImage(old.coverImage);
-    }
-    updateTag(TAGS.posts);
+    await removePost(postId);
     redirect("/admin/blog");
+  });
+}
+
+/** Delete from the article list. */
+export async function deleteListedPost(postId: number): Promise<FormState> {
+  await requireAdmin();
+  return runAction(async () => {
+    await removePost(postId);
+    return { ok: true };
+  });
+}
+
+/** The Published / Draft switch in the article list. */
+export async function setPostStatus(
+  postId: number,
+  _: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireAdmin();
+  return runAction(async () => {
+    const status = z.enum(["draft", "published"]).parse(formData.get("status"));
+    const [old] = await db.select().from(posts).where(eq(posts.id, id.parse(postId)));
+    if (!old) throw new UserError("Article not found.");
+    // The same rule as saving the article: a published one keeps its first date.
+    const publishedAt = status === "published" ? (old.publishedAt ?? new Date()) : null;
+    await db.update(posts).set({ status, publishedAt }).where(eq(posts.id, old.id));
+    updateTag(TAGS.posts);
+    return { ok: true };
   });
 }
 

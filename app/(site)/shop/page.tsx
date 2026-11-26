@@ -13,10 +13,12 @@ export default function ShopPage({ searchParams }: PageProps<"/shop">) {
       <PageHero eyebrow="Shop" title="Products we love">
         The same products our stylists use, delivered or ready to collect.
       </PageHero>
-      <div className="container-page py-12">
-        <Suspense fallback={<Loading />}>
-          <Catalogue searchParams={searchParams} />
-        </Suspense>
+      <div className="bg-white">
+        <div className="container-page py-12">
+          <Suspense fallback={<Loading />}>
+            <Catalogue searchParams={searchParams} />
+          </Suspense>
+        </div>
       </div>
     </>
   );

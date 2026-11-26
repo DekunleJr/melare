@@ -1,13 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #faf7f3;
-  --color-sand: #f1e9e0;
-  --color-line: #e5d9cd;
-  --color-ink: #2a231f;
-  --color-muted: #736257;
-  --color-clay: #8c4a3c;
-  --color-clay-dark: #70382d;
+  --color-black: #0b0908; /* header, navigation, footer */
+  --color-cream: #faf5ea; /* warm ivory page background */
+  --color-pearl: #fffcf5; /* cream card surface */
+  --color-sand: #f4ecdb; /* tinted ivory panels */
+  --color-line: #e8dcc4;
+  --color-ink: #2b211b; /* body text */
+  --color-muted: #6f6055;
+  --color-chocolate: #3d2317; /* headings */
+  --color-gold: #dcc38f; /* champagne gold buttons */
+  --color-gold-dark: #c9aa6c;
+  --color-bronze: #7a5a1e; /* gold that stays readable as text on ivory */
+  --color-bronze-dark: #5a4114;
 }
 
 @theme inline {
@@ -28,13 +33,24 @@
   h3 {
     text-wrap: balance;
   }
+  h1,
+  h2,
+  h3,
+  h4,
+  legend {
+    color: var(--color-chocolate);
+  }
   /* Edge adds its own reveal icon, which would sit beside ours. */
   input::-ms-reveal {
     display: none;
   }
   :focus-visible {
-    outline: 2px solid var(--color-clay);
+    outline: 2px solid var(--color-bronze);
     outline-offset: 2px;
+  }
+  /* Bronze is hard to see on black. */
+  .on-dark :focus-visible {
+    outline-color: var(--color-gold);
   }
   @media (prefers-reduced-motion: no-preference) {
     html {
@@ -48,16 +64,16 @@
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
   }
   .eyebrow {
-    @apply mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-clay;
+    @apply mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-bronze;
   }
   .link {
-    @apply text-clay underline underline-offset-4 hover:text-clay-dark;
+    @apply text-bronze underline underline-offset-4 hover:text-bronze-dark;
   }
   .btn {
     @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-transparent px-6 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
   }
   .btn-primary {
-    @apply bg-clay text-white hover:bg-clay-dark;
+    @apply bg-gold text-black hover:bg-gold-dark;
   }
   .btn-outline {
     @apply border-ink/25 text-ink hover:border-ink hover:bg-white;
@@ -72,10 +88,10 @@
     @apply mb-1 block text-sm font-medium;
   }
   .input {
-    @apply w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-clay focus:outline-none focus:ring-2 focus:ring-clay/20 aria-invalid:border-red-500;
+    @apply w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-bronze focus:outline-none focus:ring-2 focus:ring-bronze/20 aria-invalid:border-red-500;
   }
   .card {
-    @apply rounded-2xl border border-line bg-white p-5 sm:p-6;
+    @apply rounded-2xl border border-line bg-pearl p-5 sm:p-6;
   }
   .table-wrap {
     @apply overflow-x-auto rounded-2xl border border-line bg-white;
@@ -93,9 +109,9 @@
     @apply border-b-0;
   }
   .chip {
-    @apply cursor-pointer rounded-full border border-line bg-white px-4 py-1.5 text-sm transition-colors hover:border-clay;
+    @apply cursor-pointer rounded-full border border-line bg-white px-4 py-1.5 text-sm transition-colors hover:border-bronze;
   }
   .chip-active {
-    @apply border-clay bg-clay text-white;
+    @apply border-gold-dark bg-gold font-semibold text-black;
   }
 }

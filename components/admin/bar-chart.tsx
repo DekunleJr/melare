@@ -6,7 +6,7 @@ import { formatPence } from "@/lib/money";
 export type Bar = { label: string; pence: number };
 
 /** Validated against the white card: contrast, lightness and colour strength. */
-const SERIES = "#a8452c";
+const SERIES = "#8a661f";
 
 /** A round number at or above the largest value, for the axis. */
 function niceMax(value: number) {

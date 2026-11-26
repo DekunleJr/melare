@@ -60,7 +60,7 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <header className="border-b border-line bg-sand">
+    <header className="border-b border-line bg-cream">
       <div className="container-page py-14 text-center sm:py-20">
         {eyebrow && <p className="eyebrow">{eyebrow}</p>}
         <h1 className="font-display text-4xl sm:text-6xl">{title}</h1>
@@ -164,7 +164,7 @@ export function Photo({
 export function Loading({ label: text = "Loading…" }: { label?: string }) {
   return (
     <div role="status" className="container-page py-20 text-center text-muted">
-      <span className="mx-auto mb-3 block size-6 animate-spin rounded-full border-2 border-line border-t-clay motion-reduce:animate-none" />
+      <span className="mx-auto mb-3 block size-6 animate-spin rounded-full border-2 border-line border-t-bronze motion-reduce:animate-none" />
       {text}
     </div>
   );

@@ -1,10 +1,12 @@
 import { asc, desc, like } from "drizzle-orm";
 import Link from "next/link";
+import { RowActions } from "@/components/admin/row-actions";
 import { AdminHeader, queryText, Table } from "@/components/admin/ui";
 import { Photo, StatusBadge } from "@/components/ui/misc";
 import { db } from "@/db";
 import { withProductDetails } from "@/db/relations";
 import { products } from "@/db/schema";
+import { deleteListedProduct, setProductStatus } from "@/features/admin/catalog-actions";
 import { formatPence } from "@/lib/money";
 import { requireAdmin } from "@/lib/session";
 
@@ -33,7 +35,7 @@ export default async function ProductsPage({ searchParams }: PageProps<"/admin/p
           Add product
         </Link>
       </AdminHeader>
-      <Table head={["", "Name", "Category", "Price", "Stock", "Status"]} empty="No products yet.">
+      <Table head={["", "Name", "Category", "Price", "Stock", "Status", "Action"]} empty="No products yet.">
         {rows.map((p) => {
           const prices = p.variants.map((v) => v.salePricePence || v.pricePence);
           const stock = p.variants.reduce((n, v) => n + v.stock, 0);
@@ -43,11 +45,7 @@ export default async function ProductsPage({ searchParams }: PageProps<"/admin/p
               <td className="w-16">
                 <Photo src={p.images[0]} alt={p.name} className="size-12 rounded-lg" sizes="48px" />
               </td>
-              <td>
-                <Link href={`/admin/products/${p.id}`} prefetch={false} className="link">
-                  {p.name}
-                </Link>
-              </td>
+              <td>{p.name}</td>
               <td>{p.category?.name ?? "—"}</td>
               <td>
                 {prices.length ? formatPence(Math.min(...prices)) : "—"}
@@ -61,6 +59,16 @@ export default async function ProductsPage({ searchParams }: PageProps<"/admin/p
               </td>
               <td>
                 <StatusBadge status={p.status} />
+              </td>
+              <td>
+                <RowActions
+                  name={p.name}
+                  status={p.status}
+                  editHref={`/admin/products/${p.id}`}
+                  statusAction={setProductStatus.bind(null, p.id)}
+                  deleteAction={deleteListedProduct.bind(null, p.id)}
+                  deleteNote="A product that has been sold is archived instead."
+                />
               </td>
             </tr>
           );

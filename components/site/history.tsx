@@ -9,7 +9,7 @@ export function OrderList({ orders }: { orders: Awaited<ReturnType<typeof getMyO
     <ul className="space-y-3">
       {orders.map((order) => (
         <li key={order.id}>
-          <Link href={`/account/orders/${order.id}`} prefetch={false} className="card block hover:border-clay">
+          <Link href={`/account/orders/${order.id}`} prefetch={false} className="card block hover:border-bronze">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="font-semibold">
                 {order.number}
@@ -35,7 +35,7 @@ export function BookingList({ bookings }: { bookings: Awaited<ReturnType<typeof 
     <ul className="space-y-3">
       {bookings.map((booking) => (
         <li key={booking.id}>
-          <Link href={`/account/bookings/${booking.id}`} prefetch={false} className="card block hover:border-clay">
+          <Link href={`/account/bookings/${booking.id}`} prefetch={false} className="card block hover:border-bronze">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="font-semibold">{booking.serviceName}</p>
               <StatusBadge status={booking.status} />

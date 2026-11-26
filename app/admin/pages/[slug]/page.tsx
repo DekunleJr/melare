@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FormatHelp } from "@/components/admin/format-help";
-import { ActionButton, AdminHeader } from "@/components/admin/ui";
+import { ActionButton, AdminHeader, BackButton } from "@/components/admin/ui";
 import { ActionForm, Field, SubmitButton, TextArea } from "@/components/ui/form";
 import { db } from "@/db";
 import { contentPages } from "@/db/schema";
@@ -20,7 +20,8 @@ export default async function EditPage({ params }: PageProps<"/admin/pages/[slug
   const page = saved ?? defaultPages[slug];
 
   return (
-    <div className="max-w-3xl space-y-4">
+    <>
+      {/* Outside the narrow column, so the buttons sit at the right edge of the page. */}
       <AdminHeader title={page.title}>
         <Link href={`/${slug}`} prefetch={false} className="btn btn-outline btn-sm">
           View page
@@ -30,17 +31,20 @@ export default async function EditPage({ params }: PageProps<"/admin/pages/[slug
             Restore starting text
           </ActionButton>
         )}
+        <BackButton href="/admin/pages" />
       </AdminHeader>
-      <p className="text-sm text-muted">
-        Words in braces, such as {"{businessName}"}, {"{address}"}, {"{cancellationPolicy}"} or{" "}
-        {"{cancellationNoticeHours}"}, are filled in from Settings.
-      </p>
-      <ActionForm key={slug} action={savePage.bind(null, slug)} className="card space-y-4">
-        <Field name="title" label="Title" required defaultValue={page.title} />
-        <TextArea name="body" label="Text" rows={22} required defaultValue={page.body} />
-        <FormatHelp />
-        <SubmitButton>Save page</SubmitButton>
-      </ActionForm>
-    </div>
+      <div className="max-w-3xl space-y-4">
+        <p className="text-sm text-muted">
+          Words in braces, such as {"{businessName}"}, {"{address}"}, {"{cancellationPolicy}"} or{" "}
+          {"{cancellationNoticeHours}"}, are filled in from Settings.
+        </p>
+        <ActionForm key={slug} action={savePage.bind(null, slug)} className="card space-y-4">
+          <Field name="title" label="Title" required defaultValue={page.title} />
+          <TextArea name="body" label="Text" rows={22} required defaultValue={page.body} />
+          <FormatHelp />
+          <SubmitButton>Save page</SubmitButton>
+        </ActionForm>
+      </div>
+    </>
   );
 }

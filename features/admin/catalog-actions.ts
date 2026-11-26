@@ -46,6 +46,9 @@ import {
 
 const MIN_CHARGE = 30;
 
+/** The two choices offered by the switch in the admin lists. */
+const listStatus = z.enum(["active", "archived"]);
+
 type SluggedTable = typeof products | typeof services | typeof categories;
 
 async function uniqueSlug(table: SluggedTable, name: string, currentId?: number) {
@@ -262,27 +265,62 @@ export async function makeMainImage(imageId: number): Promise<FormState> {
   });
 }
 
+/** Deletes a product, or archives it when past orders still refer to it. */
+async function removeProduct(productId: number): Promise<"deleted" | "archived"> {
+  const target = id.parse(productId);
+  const [sold] = await db
+    .select({ id: orderItems.id })
+    .from(orderItems)
+    .where(eq(orderItems.productId, target))
+    .limit(1);
+  if (sold) {
+    await db.update(products).set({ status: "archived" }).where(eq(products.id, target));
+    updateTag(TAGS.products);
+    return "archived";
+  }
+  const images = await db.select().from(productImages).where(eq(productImages.productId, target));
+  const options = await db.select().from(productVariants).where(eq(productVariants.productId, target));
+  await db.delete(products).where(eq(products.id, target));
+  for (const image of images) await deleteImage(image.path);
+  for (const option of options) if (option.imagePath) await deleteImage(option.imagePath);
+  updateTag(TAGS.products);
+  return "deleted";
+}
+
+const archivedInstead: FormState = {
+  ok: true,
+  message: "This product has been sold before, so it was archived.",
+};
+
+/** Delete from the product's own page, which then returns to the list. */
 export async function deleteProduct(productId: number): Promise<FormState> {
   await requireAdmin();
   return runAction(async () => {
-    const target = id.parse(productId);
-    const [sold] = await db
-      .select({ id: orderItems.id })
-      .from(orderItems)
-      .where(eq(orderItems.productId, target))
-      .limit(1);
-    if (sold) {
-      await db.update(products).set({ status: "archived" }).where(eq(products.id, target));
-      updateTag(TAGS.products);
-      return { ok: true, message: "This product has been sold before, so it was archived." };
-    }
-    const images = await db.select().from(productImages).where(eq(productImages.productId, target));
-    const options = await db.select().from(productVariants).where(eq(productVariants.productId, target));
-    await db.delete(products).where(eq(products.id, target));
-    for (const image of images) await deleteImage(image.path);
-    for (const option of options) if (option.imagePath) await deleteImage(option.imagePath);
-    updateTag(TAGS.products);
+    if ((await removeProduct(productId)) === "archived") return archivedInstead;
     redirect("/admin/products");
+  });
+}
+
+/** Delete from the product list, which stays where it is (keeping any search). */
+export async function deleteListedProduct(productId: number): Promise<FormState> {
+  await requireAdmin();
+  return runAction(async () =>
+    (await removeProduct(productId)) === "archived" ? archivedInstead : { ok: true },
+  );
+}
+
+/** The Active / Archived switch in the product list. */
+export async function setProductStatus(
+  productId: number,
+  _: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireAdmin();
+  return runAction(async () => {
+    const status = listStatus.parse(formData.get("status"));
+    await db.update(products).set({ status }).where(eq(products.id, id.parse(productId)));
+    updateTag(TAGS.products);
+    return { ok: true };
   });
 }
 
@@ -416,27 +454,62 @@ export async function saveService(
   });
 }
 
+/** Deletes a service, or archives it when bookings still refer to it. */
+async function removeService(serviceId: number): Promise<"deleted" | "archived"> {
+  const target = id.parse(serviceId);
+  const [booked] = await db
+    .select({ id: bookings.id })
+    .from(bookings)
+    .where(eq(bookings.serviceId, target))
+    .limit(1);
+  if (booked) {
+    await db.update(services).set({ status: "archived" }).where(eq(services.id, target));
+    updateTag(TAGS.services);
+    return "archived";
+  }
+  const [old] = await db.select().from(services).where(eq(services.id, target));
+  const photos = await db.select().from(serviceImages).where(eq(serviceImages.serviceId, target));
+  await db.delete(services).where(eq(services.id, target));
+  await deleteImage(old?.imagePath);
+  for (const photo of photos) await deleteImage(photo.path);
+  updateTag(TAGS.services);
+  return "deleted";
+}
+
+const serviceArchivedInstead: FormState = {
+  ok: true,
+  message: "This service has bookings, so it was archived.",
+};
+
+/** Delete from the service's own page, which then returns to the list. */
 export async function deleteService(serviceId: number): Promise<FormState> {
   await requireAdmin();
   return runAction(async () => {
-    const target = id.parse(serviceId);
-    const [booked] = await db
-      .select({ id: bookings.id })
-      .from(bookings)
-      .where(eq(bookings.serviceId, target))
-      .limit(1);
-    if (booked) {
-      await db.update(services).set({ status: "archived" }).where(eq(services.id, target));
-      updateTag(TAGS.services);
-      return { ok: true, message: "This service has bookings, so it was archived." };
-    }
-    const [old] = await db.select().from(services).where(eq(services.id, target));
-    const photos = await db.select().from(serviceImages).where(eq(serviceImages.serviceId, target));
-    await db.delete(services).where(eq(services.id, target));
-    await deleteImage(old?.imagePath);
-    for (const photo of photos) await deleteImage(photo.path);
-    updateTag(TAGS.services);
+    if ((await removeService(serviceId)) === "archived") return serviceArchivedInstead;
     redirect("/admin/services");
+  });
+}
+
+/** Delete from the service list. */
+export async function deleteListedService(serviceId: number): Promise<FormState> {
+  await requireAdmin();
+  return runAction(async () =>
+    (await removeService(serviceId)) === "archived" ? serviceArchivedInstead : { ok: true },
+  );
+}
+
+/** The Active / Archived switch in the service list. */
+export async function setServiceStatus(
+  serviceId: number,
+  _: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireAdmin();
+  return runAction(async () => {
+    const status = listStatus.parse(formData.get("status"));
+    await db.update(services).set({ status }).where(eq(services.id, id.parse(serviceId)));
+    updateTag(TAGS.services);
+    return { ok: true };
   });
 }
 
@@ -537,25 +610,63 @@ export async function saveStaff(
   });
 }
 
+/** Deletes a team member, or archives them when bookings still refer to them. */
+async function removeStaff(staffId: number): Promise<"deleted" | "archived"> {
+  const target = id.parse(staffId);
+  const [booked] = await db
+    .select({ id: bookings.id })
+    .from(bookings)
+    .where(eq(bookings.staffId, target))
+    .limit(1);
+  if (booked) {
+    await db.update(staff).set({ active: false }).where(eq(staff.id, target));
+    updateTag(TAGS.staff);
+    updateTag(TAGS.services);
+    return "archived";
+  }
+  const [old] = await db.select().from(staff).where(eq(staff.id, target));
+  await db.delete(staff).where(eq(staff.id, target));
+  await deleteImage(old?.imagePath);
+  updateTag(TAGS.staff);
+  updateTag(TAGS.services);
+  return "deleted";
+}
+
+const staffArchivedInstead: FormState = {
+  ok: true,
+  message: "This person has bookings, so they were archived.",
+};
+
+/** Delete from the person's own page, which then returns to the list. */
 export async function deleteStaff(staffId: number): Promise<FormState> {
   await requireAdmin();
   return runAction(async () => {
-    const target = id.parse(staffId);
-    const [booked] = await db
-      .select({ id: bookings.id })
-      .from(bookings)
-      .where(eq(bookings.staffId, target))
-      .limit(1);
-    if (booked) {
-      await db.update(staff).set({ active: false }).where(eq(staff.id, target));
-      updateTag(TAGS.staff);
-      return { ok: true, message: "This person has bookings, so they were made inactive." };
-    }
-    const [old] = await db.select().from(staff).where(eq(staff.id, target));
-    await db.delete(staff).where(eq(staff.id, target));
-    await deleteImage(old?.imagePath);
-    updateTag(TAGS.staff);
+    if ((await removeStaff(staffId)) === "archived") return staffArchivedInstead;
     redirect("/admin/staff");
+  });
+}
+
+/** Delete from the staff list. */
+export async function deleteListedStaff(staffId: number): Promise<FormState> {
+  await requireAdmin();
+  return runAction(async () =>
+    (await removeStaff(staffId)) === "archived" ? staffArchivedInstead : { ok: true },
+  );
+}
+
+/** The Active / Archived switch in the staff list. Archived staff cannot be booked. */
+export async function setStaffStatus(
+  staffId: number,
+  _: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireAdmin();
+  return runAction(async () => {
+    const active = listStatus.parse(formData.get("status")) === "active";
+    await db.update(staff).set({ active }).where(eq(staff.id, id.parse(staffId)));
+    updateTag(TAGS.staff);
+    updateTag(TAGS.services);
+    return { ok: true };
   });
 }
 

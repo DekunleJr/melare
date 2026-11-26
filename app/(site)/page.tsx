@@ -39,7 +39,7 @@ export default async function HomePage() {
         // "<" is escaped so settings text can never close the script tag.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-      <section className="border-b border-line bg-sand">
+      <section className="border-b border-line">
         <div className="container-page grid items-center gap-10 py-14 lg:grid-cols-2 lg:py-20">
           <div>
             <p className="eyebrow">{s.tagline}</p>
@@ -76,7 +76,7 @@ export default async function HomePage() {
       )}
 
       {products.length > 0 && (
-        <section className="bg-white py-16">
+        <section className="border-y border-line py-16">
           <div className="container-page">
             <SectionTitle eyebrow="Take the salon home" title="From our shelves" href="/shop" linkLabel="Visit the shop" />
             <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
@@ -90,7 +90,7 @@ export default async function HomePage() {
 
       {team.length > 0 && (
         <section className="container-page py-16">
-          <SectionTitle eyebrow="Our people" title="Meet the team" href="/team" linkLabel="Full team" />
+          <SectionTitle eyebrow="Our people" title="Meet the team" href="/about#team" linkLabel="Full team" />
           <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
             {team.slice(0, 4).map((person) => (
               <div key={person.id}>
@@ -115,7 +115,7 @@ export default async function HomePage() {
       )}
 
       {reviews.length > 0 && (
-        <section className="bg-sand py-16">
+        <section className="border-y border-line py-16">
           <div className="container-page">
             <SectionTitle eyebrow="Kind words" title="From our customers" />
             <ReviewList reviews={reviews.slice(0, 6)} />

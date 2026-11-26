@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { SignOutButton } from "@/components/site/auth-forms";
+import { NavLink } from "@/components/ui/nav-link";
 
 export const metadata: Metadata = { title: "My account", robots: { index: false } };
 
@@ -19,9 +19,16 @@ export default function AccountLayout({ children }: LayoutProps<"/account">) {
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
         <nav aria-label="Account" className="flex flex-wrap gap-2">
           {links.map(([href, text]) => (
-            <Link key={href} href={href} prefetch={false} className="chip">
+            <NavLink
+              key={href}
+              href={href}
+              exact={href === "/account"}
+              prefetch={false}
+              className="chip"
+              activeClassName="aria-[current=page]:border-neutral-400 aria-[current=page]:bg-neutral-300"
+            >
               {text}
-            </Link>
+            </NavLink>
           ))}
         </nav>
         <SignOutButton />

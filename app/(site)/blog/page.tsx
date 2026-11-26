@@ -26,7 +26,7 @@ export default async function BlogPage() {
                 {post.publishedAt && (
                   <p className="mt-3 text-xs text-muted">{formatShortDate(post.publishedAt)}</p>
                 )}
-                <h2 className="font-display text-2xl group-hover:text-clay">{post.title}</h2>
+                <h2 className="font-display text-2xl group-hover:text-bronze">{post.title}</h2>
                 <p className="mt-1 text-sm text-muted">{post.excerpt}</p>
               </Link>
             </article>

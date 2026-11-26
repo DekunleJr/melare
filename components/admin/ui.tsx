@@ -1,3 +1,4 @@
+import { ArrowLeft, Pencil, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ActionForm, SubmitButton } from "@/components/ui/form";
@@ -9,6 +10,40 @@ export function AdminHeader({ title, children }: { title: string; children?: Rea
       <h1 className="font-display text-3xl sm:text-4xl">{title}</h1>
       {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
     </div>
+  );
+}
+
+/** A round icon button in a table's Action column. The pencil opens a record to edit it. */
+export function IconLink({
+  href,
+  label,
+  icon: Icon = Pencil,
+}: {
+  href: string;
+  /** Read out by screen readers and shown on hover */
+  label: string;
+  icon?: LucideIcon;
+}) {
+  return (
+    <Link
+      href={href}
+      prefetch={false}
+      className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-ink transition-colors hover:border-gold-dark hover:bg-gold"
+      aria-label={label}
+      title={label}
+    >
+      <Icon size={15} aria-hidden="true" />
+    </Link>
+  );
+}
+
+/** Leaves an edit page without saving. */
+export function BackButton({ href }: { href: string }) {
+  return (
+    <Link href={href} prefetch={false} className="btn btn-outline btn-sm">
+      <ArrowLeft size={15} aria-hidden="true" />
+      Back
+    </Link>
   );
 }
 

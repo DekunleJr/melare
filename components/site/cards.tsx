@@ -7,13 +7,17 @@ import { formatDuration, formatShortDate } from "@/lib/time";
 
 export function ProductCard({ product, eager }: { product: ShopProduct; eager?: boolean }) {
   return (
-    <Link href={`/shop/${product.slug}`} prefetch={false} className="group block">
-      <Photo src={product.images[0]} alt={product.name} eager={eager} className="aspect-[4/5] rounded-2xl" />
-      <div className="mt-3">
+    <Link
+      href={`/shop/${product.slug}`}
+      prefetch={false}
+      className="group block overflow-hidden rounded-2xl border border-line bg-pearl transition-colors hover:border-gold-dark"
+    >
+      <Photo src={product.images[0]} alt={product.name} eager={eager} className="aspect-[4/5]" />
+      <div className="p-3 sm:p-4">
         {product.category && (
           <p className="text-xs uppercase tracking-wider text-muted">{product.category.name}</p>
         )}
-        <h3 className="font-semibold group-hover:text-clay">{product.name}</h3>
+        <h3 className="font-semibold group-hover:text-bronze">{product.name}</h3>
         <p className="text-sm">
           {product.variesInPrice && "From "}
           {formatPence(product.pricePence)}
@@ -36,14 +40,14 @@ export function ProductCard({ product, eager }: { product: ShopProduct; eager?: 
 
 export function ServiceCard({ service, eager }: { service: PublicService; eager?: boolean }) {
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-pearl">
       <Link href={`/services/${service.slug}`} prefetch={false} tabIndex={-1} aria-hidden="true">
         <Photo src={service.imagePath} alt={service.name} eager={eager} className="aspect-[3/2]" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
       </Link>
       <div className="flex flex-1 flex-col p-5">
         <p className="text-xs uppercase tracking-wider text-muted">{service.category}</p>
         <h3 className="font-display text-2xl">
-          <Link href={`/services/${service.slug}`} prefetch={false} className="hover:text-clay">
+          <Link href={`/services/${service.slug}`} prefetch={false} className="hover:text-bronze">
             {service.name}
           </Link>
         </h3>

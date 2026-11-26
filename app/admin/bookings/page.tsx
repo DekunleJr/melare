@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, gte, like, lt, or } from "drizzle-orm";
 import Link from "next/link";
-import { AdminHeader, PAGE_SIZE, Pagination, queryPage, queryText, Table } from "@/components/admin/ui";
+import { AdminHeader, PAGE_SIZE, Pagination, queryPage, queryText, Table, IconLink } from "@/components/admin/ui";
 import { StatusBadge } from "@/components/ui/misc";
 import { db } from "@/db";
 import { bookings, bookingStatuses } from "@/db/schema/sales";
@@ -86,17 +86,13 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
           </Link>
         </div>
       )}
-      <Table head={["When", "Reference", "Customer", "Service", "With", "Paid", "Status"]} empty="No bookings found.">
+      <Table head={["When", "Reference", "Customer", "Service", "With", "Paid", "Status", "Action"]} empty="No bookings found.">
         {shown.map((b) => (
           <tr key={b.id}>
             <td className="whitespace-nowrap">
               {day ? `${formatTime(b.startsAt)} – ${formatTime(b.endsAt)}` : formatDateTime(b.startsAt)}
             </td>
-            <td>
-              <Link href={`/admin/bookings/${b.id}`} prefetch={false} className="link">
-                {b.reference}
-              </Link>
-            </td>
+            <td>{b.reference}</td>
             <td>
               {b.customerName}
               <span className="block text-xs text-muted">{b.customerPhone}</span>
@@ -106,6 +102,9 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
             <td>{b.paidPence ? formatPence(b.paidPence - b.refundedPence) : "—"}</td>
             <td>
               <StatusBadge status={b.status} />
+            </td>
+            <td>
+              <IconLink href={`/admin/bookings/${b.id}`} label={`Edit booking ${b.reference}`} />
             </td>
           </tr>
         ))}

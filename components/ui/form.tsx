@@ -208,7 +208,7 @@ export function Select({
 export function Checkbox({ label, ...props }: ComponentProps<"input"> & { label: string }) {
   return (
     <label className="flex items-center gap-2 text-sm">
-      <input type="checkbox" className="size-4 accent-clay" {...props} />
+      <input type="checkbox" className="size-4 accent-bronze" {...props} />
       {label}
     </label>
   );

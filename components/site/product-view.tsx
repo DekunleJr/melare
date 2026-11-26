@@ -78,7 +78,7 @@ export function ProductView({
                 aria-label={`Show image ${i + 1}`}
                 aria-pressed={shown === src}
                 onClick={() => setPicture(src)}
-                className={`relative size-20 cursor-pointer overflow-hidden rounded-xl border-2 ${shown === src ? "border-clay" : "border-transparent"}`}
+                className={`relative size-20 cursor-pointer overflow-hidden rounded-xl border-2 ${shown === src ? "border-bronze" : "border-transparent"}`}
               >
                 <Image src={src} alt="" fill sizes="80px" className="object-cover" />
               </button>
